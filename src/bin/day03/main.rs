@@ -1,3 +1,5 @@
+use std::collections::BTreeMap;
+//use std::collections::HashMap;
 use std::collections::HashSet;
 use std::str;
 
@@ -10,7 +12,7 @@ use lib::error::Fail;
 //#2 @ 3,1: 4x4
 //#3 @ 5,5: 2x2
 
-#[derive(Debug, Clone, Eq, PartialEq, Hash)]
+#[derive(Debug, Clone, Eq, PartialEq, Hash, PartialOrd, Ord)]
 struct Square {
     left: u32,
     top: u32,
@@ -145,9 +147,63 @@ fn test_count_overlap_squares() {
     assert_eq!(count_overlap_squares(&claims), 4);
 }
 
+fn find_nonoverlapping_claim(claims: &[Claim]) -> Option<usize> {
+    let mut taken_by: BTreeMap<Square, HashSet<usize>> = BTreeMap::new();
+    for claim in claims.iter() {
+        for square in claim.squares() {
+            taken_by
+                .entry(square)
+                .and_modify(|v| {
+                    v.insert(claim.id);
+                })
+                .or_insert_with(|| {
+                    let mut v = HashSet::new();
+                    v.insert(claim.id);
+                    v
+                });
+        }
+    }
+    let mut non_overlapping: HashSet<usize> = claims.iter().map(|claim| claim.id).collect();
+    for (_, takers) in taken_by.iter() {
+        if takers.len() > 1 {
+            for claim_id in takers.iter() {
+                non_overlapping.remove(claim_id);
+            }
+        }
+    }
+    if non_overlapping.len() > 1 {
+        None
+    } else {
+        non_overlapping.iter().copied().next()
+    }
+}
+
+#[test]
+fn test_find_nonoverlapping_claim() {
+    let claims = get_claims(concat!(
+        "#1 @ 1,3: 4x4\n",
+        "#2 @ 3,1: 4x4\n",
+        "#3 @ 5,5: 2x2\n"
+    ))
+    .expect("valid test input");
+    match find_nonoverlapping_claim(&claims) {
+        Some(3) => (),
+        Some(n) => {
+            panic!("wrong non-overlap id, expected 3 but got {n}");
+        }
+        None => {
+            panic!("failed to find non-overlap");
+        }
+    }
+}
+
 fn main() {
     let claims = get_claims(str::from_utf8(include_bytes!("input.txt")).expect("valid input file"))
         .expect("valid claim lines");
     // 327761 is too high
     println!("Day 03 part 1: {}", count_overlap_squares(&claims));
+    println!(
+        "Day 03 part 2: {}",
+        find_nonoverlapping_claim(&claims).expect("at least one overlap")
+    );
 }
