@@ -12,14 +12,10 @@ fn first_repeat(c: &[i64]) -> Option<i64> {
         seen.entry(current)
             .and_modify(|counter| *counter += 1)
             .or_insert(1);
-        match seen.get(&current) {
-            Some(2) => {
-                return Some(current);
-            }
-            _ => (),
+        if let Some(2) = seen.get(&current) {
+            return Some(current);
         }
     }
-    dbg!(&seen);
     None
 }
 
@@ -46,7 +42,7 @@ fn test_part2() {
 
 fn main() {
     let text = str::from_utf8(include_bytes!("input.txt")).unwrap();
-    let frequencies = get_input(&text).expect("wanted valid input");
+    let frequencies = get_input(text).expect("wanted valid input");
     let first_repeat: Option<i64> = first_repeat(&frequencies);
     println!("Day 01 part 1: {}", frequencies.iter().sum::<i64>());
     println!("Day 01 part 2: {}", first_repeat.expect("expected repeat"));
