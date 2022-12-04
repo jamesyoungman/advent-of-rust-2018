@@ -1,8 +1,7 @@
 use itertools::Itertools;
+use lib::error::Fail;
 use std::collections::HashMap;
 use std::str;
-
-use lib::error::Fail;
 
 fn letters_by_freq(s: &str) -> HashMap<usize, Vec<char>> {
     let mut freqs_by_letter: HashMap<char, usize> = HashMap::new();
