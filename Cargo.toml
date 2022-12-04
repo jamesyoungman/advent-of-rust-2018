@@ -9,12 +9,12 @@ authors = ["James Youngman <james@youngman.org>"]
 [dependencies]
 clap = "3"
 itertools = "0.4"
-#ndarray = "0.15"		# day 09, 19
-#nom = "7"			# day 17
-#pathfinding = "3.0.5"           # day 15
-#regex = "1"			# day 18, 19
-#tracing = "0.1"                 # day 17
-#tracing-subscriber = "0.2"	# day 17
+#ndarray = "0.15"
+#nom = "7"
+#pathfinding = "3.0.5"
+regex = "1"
+#tracing = "0.1"
+#tracing-subscriber = "0.2"
 
 [profile.release]
 debug = 1
@@ -28,3 +28,5 @@ path = "src/lib/lib.rs"
 name = "day01"
 [[bin]]
 name = "day02"
+[[bin]]
+name = "day03"
