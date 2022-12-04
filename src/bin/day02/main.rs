@@ -16,7 +16,7 @@ fn letters_by_freq(s: &str) -> HashMap<usize, Vec<char>> {
         letters_by_freq
             .entry(*freq)
             .and_modify(|letters| letters.push(*letter))
-            .or_insert(vec![*letter]);
+            .or_insert_with(|| vec![*letter]);
     }
     letters_by_freq
 }
@@ -97,7 +97,7 @@ fn test_id_pair() {
 }
 
 fn solve_part2(ids: &[&str]) -> Result<String, Fail> {
-    match find_id_pair(&ids) {
+    match find_id_pair(ids) {
         None => Err(Fail("no suitable pair".to_string())),
         Some((left, right)) => {
             let rest: String = left

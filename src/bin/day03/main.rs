@@ -104,7 +104,7 @@ fn test_claim_parser() {
     assert!(parser.parse("#1 @ 1,3: 4y4").is_err());
     assert!(parser.parse("#1 @ 1,3: x4").is_err());
     assert!(parser.parse("#1 @ 1,3: 4x").is_err());
-    assert!(!parser.parse("#1 @ 1,3: 4x4z").is_ok());
+    assert!(parser.parse("#1 @ 1,3: 4x4z").is_err());
 
     assert_eq!(
         parser.parse("#1 @ 1,3: 4x4").expect("test data is valid"),
