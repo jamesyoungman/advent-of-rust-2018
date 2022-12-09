@@ -1,3 +1,4 @@
+use std::collections::BTreeSet;
 use std::str;
 
 fn invert_polarity(ch: char) -> char {
@@ -28,7 +29,7 @@ fn react_once(letters: &[char]) -> (Vec<char>, bool) {
             continue;
         }
         match pair {
-            &[a, b] if have_opposite_polarity(a, b) => {
+            [a, b] if have_opposite_polarity(*a, *b) => {
                 //println!("eating {pair:?}");
                 leftover = None;
                 changed = true;
@@ -36,13 +37,9 @@ fn react_once(letters: &[char]) -> (Vec<char>, bool) {
                 // of a pair next time around the loop.
                 skip = true;
             }
-            &[a, b] => {
-                leftover = Some(b);
-                result.push(a);
-                //println!(
-                //    "passing through {a}, setting leftover={}",
-                //    leftover.unwrap()
-                //);
+            [a, b] => {
+                leftover = Some(*b);
+                result.push(*a);
             }
             _ => unreachable!(),
         }
@@ -93,14 +90,54 @@ fn test_react_fully() {
 }
 
 #[test]
-fn test_provided_example() {
+fn test_provided_example_part1() {
     assert_eq!(react_fully("dabAcCaCBAcCcaDA"), "dabCBAcaDA");
+}
+
+fn delete_type(lower: char, upper: char, input: &str) -> String {
+    input
+        .chars()
+        .filter(|&ch| ch != lower && ch != upper)
+        .collect()
+}
+
+fn solve_part2(input: &str) -> Option<(char, usize)> {
+    let all_types: BTreeSet<char> = input.chars().map(|ch| ch.to_ascii_lowercase()).collect();
+    //println!("There are {} types to test deletion", all_types.len());
+    let mut best: Option<(char, usize)> = None;
+    for goner in all_types.into_iter() {
+        //println!("Trying deletion of {goner}");
+        let trial = delete_type(goner, goner.to_ascii_uppercase(), input);
+        let result = react_fully(&trial);
+        match best {
+            Some((_, len)) if len < result.len() => (),
+            _ => best = Some((goner, result.len())),
+        }
+    }
+    best
+}
+
+#[test]
+fn test_provided_example_part2() {
+    let best = solve_part2("dabAcCaCBAcCcaDA");
+    match best {
+        None => {
+            panic!("failed to solve part 2 example");
+        }
+        Some((ch, len)) => {
+            assert_eq!(ch, 'c');
+            assert_eq!(len, 4);
+        }
+    }
 }
 
 fn main() {
     let input = str::from_utf8(include_bytes!("input.txt"))
         .expect("input file should be correctly encoded")
         .trim();
-    let part1 = react_fully(input);
-    println!("Day 05 part 1: {}", part1.len());
+    println!("Day 05 part 1: {}", react_fully(input).len());
+    println!(
+        "Day 05 part 2: {}",
+        solve_part2(input).expect("problem should be solvable").1
+    );
 }
