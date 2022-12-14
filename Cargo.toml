@@ -8,7 +8,7 @@ authors = ["James Youngman <james@youngman.org>"]
 
 [dependencies]
 clap = "3"
-itertools = "0.4"
+itertools = "0.10"
 #ndarray = "0.15"
 #nom = "7"
 #pathfinding = "3.0.5"
